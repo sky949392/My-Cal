@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Daymark Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Calendar sidebar">
+      <a class="brand" href="#" aria-label="Daymark home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>daymark</span>
+      </a>
+
+      <button class="button button-primary sidebar-add" id="addEventButton" type="button">
+        <span aria-hidden="true">＋</span> Create event
+      </button>
+
+      <section class="mini-calendar-section" aria-label="Mini calendar">
+        <div class="mini-calendar-heading">
+          <h2 id="miniMonthLabel"></h2>
+          <div class="icon-button-group">
+            <button class="icon-button mini-nav" id="miniPrevious" type="button" aria-label="Previous month">‹</button>
+            <button class="icon-button mini-nav" id="miniNext" type="button" aria-label="Next month">›</button>
+          </div>
+        </div>
+        <div class="mini-weekdays" aria-hidden="true">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+        <div class="mini-grid" id="miniCalendar" role="group" aria-label="Choose a date"></div>
+      </section>
+
+      <section class="category-section">
+        <div class="section-heading">
+          <h2>My calendars</h2>
+          <button class="text-icon-button" id="clearFilters" type="button" aria-label="Show all categories" title="Show all categories">＋</button>
+        </div>
+        <div class="category-list" id="categoryFilters"></div>
+      </section>
+
+      <section class="upcoming-section">
+        <div class="section-heading">
+          <h2>Coming up</h2>
+          <span class="section-caption">Next 7 days</span>
+        </div>
+        <div class="upcoming-list" id="upcomingEvents"></div>
+      </section>
+
+      <div class="sidebar-footer">
+        <span class="avatar" aria-hidden="true">D</span>
+        <span class="profile-copy"><strong>Your calendar</strong><small>Personal workspace</small></span>
+        <span class="online-dot" aria-label="Available"></span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="today-copy">
+          <span class="eyebrow">YOUR PLANS, IN ONE PLACE</span>
+          <p id="currentDateLabel"></p>
+        </div>
+        <div class="topbar-actions">
+          <label class="search-box" for="searchInput">
+            <span aria-hidden="true" class="search-icon"></span>
+            <input id="searchInput" type="search" placeholder="Search events..." autocomplete="off">
+            <button id="clearSearch" class="clear-search" type="button" aria-label="Clear search" hidden>×</button>
+            <kbd>⌘ K</kbd>
+          </label>
+          <button class="icon-button theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" title="Toggle dark mode">
+            <span aria-hidden="true" id="themeIcon">☾</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="calendar-panel" aria-label="Interactive calendar">
+        <div class="calendar-toolbar">
+          <div class="calendar-title-group">
+            <h1 id="calendarTitle"></h1>
+            <div class="month-navigation" aria-label="Calendar navigation">
+              <button class="icon-button" id="previousPeriod" type="button" aria-label="Previous period">‹</button>
+              <button class="icon-button" id="nextPeriod" type="button" aria-label="Next period">›</button>
+              <button class="button button-today" id="todayButton" type="button">Today</button>
+            </div>
+          </div>
+          <div class="toolbar-controls">
+            <div class="view-switcher" role="group" aria-label="Calendar view">
+              <button type="button" class="view-button active" data-view="month" aria-pressed="true">Month</button>
+              <button type="button" class="view-button" data-view="week" aria-pressed="false">Week</button>
+              <button type="button" class="view-button" data-view="day" aria-pressed="false">Day</button>
+            </div>
+            <button class="button button-primary compact-add" id="compactAddEvent" type="button"><span aria-hidden="true">＋</span> Add event</button>
+          </div>
+        </div>
+        <div class="filter-summary" id="filterSummary" aria-live="polite"></div>
+        <div class="calendar-content" id="calendarContent"></div>
+        <p class="calendar-status" id="calendarStatus" role="status" aria-live="polite"></p>
+      </section>
+      <footer class="page-footer"><span>Make room for what matters.</span><span>DAYMARK <span aria-hidden="true">·</span> YOUR PERSONAL SPACE</span></footer>
+    </main>
+  </div>
+
+  <dialog class="event-dialog" id="eventDialog" aria-labelledby="dialogTitle">
+    <form id="eventForm" novalidate>
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">YOUR CALENDAR</span>
+          <h2 id="dialogTitle">Create an event</h2>
+        </div>
+        <button type="button" class="icon-button dialog-close" id="closeDialog" aria-label="Close dialog">×</button>
+      </div>
+      <input id="eventId" type="hidden">
+      <div class="form-field">
+        <label for="eventTitle">Event title <span class="required">*</span></label>
+        <input id="eventTitle" name="title" type="text" maxlength="100" placeholder="Give your event a name" required>
+        <span class="field-error" id="titleError"></span>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="eventDate">Date <span class="required">*</span></label>
+          <input id="eventDate" name="date" type="date" required>
+        </div>
+        <div class="form-field">
+          <label for="eventCategory">Category</label>
+          <select id="eventCategory" name="category">
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="health">Health</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="eventStart">Starts <span class="required">*</span></label>
+          <input id="eventStart" name="start" type="time" value="09:00" required>
+        </div>
+        <div class="form-field">
+          <label for="eventEnd">Ends <span class="required">*</span></label>
+          <input id="eventEnd" name="end" type="time" value="10:00" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="eventLocation">Location <span class="optional">(optional)</span></label>
+        <input id="eventLocation" name="location" type="text" maxlength="120" placeholder="Add a place">
+      </div>
+      <div class="form-field">
+        <label for="eventDescription">Description <span class="optional">(optional)</span></label>
+        <textarea id="eventDescription" name="description" rows="3" maxlength="500" placeholder="Add a few details..."></textarea>
+      </div>
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button button-danger" id="deleteEventButton" type="button" hidden>Delete event</button>
+        <span class="action-spacer"></span>
+        <button class="button button-quiet" id="cancelDialog" type="button">Cancel</button>
+        <button class="button button-primary" type="submit" id="saveEventButton">Save event</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
